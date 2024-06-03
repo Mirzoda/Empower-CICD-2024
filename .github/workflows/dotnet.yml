@@ -11,7 +11,6 @@ on:
 
 jobs:
   CI:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +25,7 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      
     - name: Install Connector Validator
       run: dotnet tool install -g Skyline.DataMiner.CICD.Tools.Validator
 
@@ -49,3 +49,21 @@ jobs:
           echo "Error: CriticalIssueCount or MajorIssueCount is not 0"
           exit 1
         fi
+        
+  CD:
+    runs-on: windows-latest
+    needs: CI
+    steps:
+    - uses: actions/checkout@v4
+  
+    - name: Install Package Creation
+      run: dotnet tool install -g Skyline.DataMiner.CICD.Tools.Packager
+    - name: Create Protocol Package
+      run: dataminer-package-create dmprotocol "${{ github.workspace }}" --name "protocol" --output "${{ github.workspace }}\\_PackageResults"
+
+    - name: Archive Package
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: packageResults
+        path: ${{ github.workspace }}\\_PackageResults\\*
