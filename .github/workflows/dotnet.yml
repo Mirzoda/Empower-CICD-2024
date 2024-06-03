@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  CI:
 
     runs-on: ubuntu-latest
 
@@ -37,7 +37,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: validateResults
-        path: ${{ github.workspace }}/validateResults.json
+        path: ${{ github.workspace }}/validateResults.*
 
     - name: Quality Gate
       run: |
